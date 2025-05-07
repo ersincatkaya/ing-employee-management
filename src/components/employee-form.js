@@ -145,6 +145,9 @@ export class EmployeeForm extends LitElement {
       position: 'Junior',
     };
     window.dispatchEvent(new CustomEvent('employee-updated'));
+    this.dispatchEvent(
+      new CustomEvent('submit-done', {bubbles: true, composed: true})
+    );
   }
 }
 

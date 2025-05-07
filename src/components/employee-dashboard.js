@@ -8,6 +8,12 @@ export class EmployeeDashboard extends LitElement {
       display: flex;
       justify-content: space-between;
       align-items: center;
+      padding: 20px;
+    }
+
+    h2 {
+      margin: 0;
+      font-size: 20px;
     }
 
     button {
@@ -26,28 +32,35 @@ export class EmployeeDashboard extends LitElement {
   `;
 
   static properties = {
-    dialogOpen: {type: Boolean},
+    showDialog: {type: Boolean},
   };
 
   constructor() {
     super();
-    this.dialogOpen = false;
+    this.showDialog = false;
   }
 
   render() {
     return html`
       <div class="header">
         <h2>Employees</h2>
-        <button @click=${() => (this.dialogOpen = true)}>➕ Add New</button>
+        <button @click=${() => (this.showDialog = true)}>+ Add New</button>
       </div>
 
       <employee-list></employee-list>
 
-      <employee-dialog
-        .open=${this.dialogOpen}
-        @dialog-closed=${() => (this.dialogOpen = false)}
-      ></employee-dialog>
+      ${this.showDialog
+        ? html`
+            <employee-dialog
+              @close-dialog=${this._handleDialogClose}
+            ></employee-dialog>
+          `
+        : ''}
     `;
+  }
+
+  _handleDialogClose() {
+    this.showDialog = false;
   }
 }
 

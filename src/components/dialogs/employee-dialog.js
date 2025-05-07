@@ -2,24 +2,41 @@ import {LitElement, html, css} from 'lit';
 import '../employee-form.js';
 
 export class EmployeeDialog extends LitElement {
-  static properties = {
-    open: {type: Boolean},
-  };
-
   static styles = css`
-    dialog {
-      border: none;
+    .overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background-color: rgba(0, 0, 0, 0.4);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+    }
+
+    .dialog {
+      background: white;
+      padding: 24px;
       border-radius: 8px;
-      padding: 0;
-      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+      max-width: 500px;
+      width: 100%;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
     }
-    dialog::backdrop {
-      background: rgba(0, 0, 0, 0.3);
+
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
     }
+
+    .header h3 {
+      margin: 0;
+    }
+
     .close-btn {
-      position: absolute;
-      top: 10px;
-      right: 15px;
       background: none;
       border: none;
       font-size: 20px;
@@ -27,31 +44,30 @@ export class EmployeeDialog extends LitElement {
     }
   `;
 
-  constructor() {
-    super();
-    this.open = false;
-  }
-
-  updated(changedProps) {
-    if (changedProps.has('open')) {
-      const dialog = this.shadowRoot.querySelector('dialog');
-      if (this.open) dialog.showModal();
-      else dialog.close();
-    }
-  }
-
   render() {
     return html`
-      <dialog @close=${() => (this.open = false)}>
-        <button class="close-btn" @click=${this._close}>x</button>
-        <employee-form></employee-form>
-      </dialog>
+      <div class="overlay" @click=${this._closeOutside}>
+        <div class="dialog" @click=${(e) => e.stopPropagation()}>
+          <div class="header">
+            <h3>Add New Employee</h3>
+            <button class="close-btn" @click=${this._closeDialog}>
+              &times;
+            </button>
+          </div>
+          <employee-form @submit-done=${this._closeDialog}></employee-form>
+        </div>
+      </div>
     `;
   }
 
-  _close() {
-    this.open = false;
-    this.dispatchEvent(new CustomEvent('dialog-closed'));
+  _closeOutside() {
+    this._closeDialog();
+  }
+
+  _closeDialog() {
+    this.dispatchEvent(
+      new CustomEvent('close-dialog', {bubbles: true, composed: true})
+    );
   }
 }
 
