@@ -1,18 +1,17 @@
-import {reactive} from '@lit/reactive-element';
-
-export const EmployeeStore = reactive({
+export const EmployeeStore = {
   employees: [],
 
   addEmployee(employee) {
-    this.employees = [...this.employees, employee];
+    this.employees.push(employee);
     this.saveToStorage();
   },
 
   updateEmployee(updated) {
-    this.employees = this.employees.map((emp) =>
-      emp.id === updated.id ? updated : emp
-    );
-    this.saveToStorage();
+    const index = this.employees.findIndex((emp) => emp.id === updated.id);
+    if (index !== -1) {
+      this.employees[index] = updated;
+      this.saveToStorage();
+    }
   },
 
   deleteEmployee(id) {
@@ -30,4 +29,7 @@ export const EmployeeStore = reactive({
       this.employees = JSON.parse(stored);
     }
   },
-});
+};
+
+// Load immediately
+EmployeeStore.loadFromStorage();

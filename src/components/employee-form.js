@@ -144,6 +144,7 @@ export class EmployeeForm extends LitElement {
       department: 'Analytics',
       position: 'Junior',
     };
+    window.dispatchEvent(new CustomEvent('employee-updated'));
   }
 }
 

@@ -17,11 +17,19 @@ export class EmployeeList extends LitElement {
     }
 
     th {
-      background-color: #f4f4f4;
+      background-color: #f2f2f2;
     }
 
-    tr:nth-child(even) {
-      background-color: #fafafa;
+    button {
+      padding: 5px 10px;
+      background-color: #dc3545;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #c82333;
     }
   `;
 
@@ -31,61 +39,67 @@ export class EmployeeList extends LitElement {
 
   constructor() {
     super();
-    // Load from store and listen for changes
-    this.employees = EmployeeStore.employees;
-    EmployeeStore.loadFromStorage();
+    this.employees = [...EmployeeStore.employees];
   }
 
   connectedCallback() {
     super.connectedCallback();
-    // Re-render on store update (basic reactive setup)
-    this._interval = setInterval(() => {
-      this.employees = [...EmployeeStore.employees];
-    }, 500);
+    window.addEventListener('employee-updated', this._refreshList);
   }
 
   disconnectedCallback() {
-    clearInterval(this._interval);
     super.disconnectedCallback();
+    window.removeEventListener('employee-updated', this._refreshList);
+  }
+
+  _refreshList = () => {
+    this.employees = [...EmployeeStore.employees];
+  };
+
+  _deleteEmployee(id) {
+    EmployeeStore.deleteEmployee(id);
+    this._refreshList();
   }
 
   render() {
+    if (this.employees.length === 0) {
+      return html`<p>No employees found.</p>`;
+    }
+
     return html`
       <h2>Employee List</h2>
-      ${this.employees.length === 0
-        ? html`<p>No employees found.</p>`
-        : html`
-            <table>
-              <thead>
-                <tr>
-                  <th>First</th>
-                  <th>Last</th>
-                  <th>Birth</th>
-                  <th>Employment</th>
-                  <th>Phone</th>
-                  <th>Email</th>
-                  <th>Department</th>
-                  <th>Position</th>
-                </tr>
-              </thead>
-              <tbody>
-                ${this.employees.map(
-                  (emp) => html`
-                    <tr>
-                      <td>${emp.firstName}</td>
-                      <td>${emp.lastName}</td>
-                      <td>${emp.dateOfBirth}</td>
-                      <td>${emp.dateOfEmployment}</td>
-                      <td>${emp.phone}</td>
-                      <td>${emp.email}</td>
-                      <td>${emp.department}</td>
-                      <td>${emp.position}</td>
-                    </tr>
-                  `
-                )}
-              </tbody>
-            </table>
-          `}
+      <table>
+        <thead>
+          <tr>
+            <th>First</th>
+            <th>Last</th>
+            <th>Email</th>
+            <th>Phone</th>
+            <th>Dept.</th>
+            <th>Position</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${this.employees.map(
+            (emp) => html`
+              <tr>
+                <td>${emp.firstName}</td>
+                <td>${emp.lastName}</td>
+                <td>${emp.email}</td>
+                <td>${emp.phone}</td>
+                <td>${emp.department}</td>
+                <td>${emp.position}</td>
+                <td>
+                  <button @click=${() => this._deleteEmployee(emp.id)}>
+                    Delete
+                  </button>
+                </td>
+              </tr>
+            `
+          )}
+        </tbody>
+      </table>
     `;
   }
 }
