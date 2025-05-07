@@ -6,30 +6,29 @@ export class EmployeeList extends LitElement {
     table {
       width: 100%;
       border-collapse: collapse;
-      margin-top: 20px;
     }
 
     th,
     td {
-      border: 1px solid #ccc;
-      padding: 8px;
+      padding: 10px;
       text-align: left;
+      border-bottom: 1px solid #ddd;
     }
 
     th {
-      background-color: #f2f2f2;
+      color: #f60;
+    }
+
+    .actions {
+      display: flex;
+      gap: 10px;
     }
 
     button {
-      padding: 5px 10px;
-      background-color: #dc3545;
-      color: white;
+      background: none;
       border: none;
       cursor: pointer;
-    }
-
-    button:hover {
-      background-color: #c82333;
+      color: orange;
     }
   `;
 
@@ -39,43 +38,32 @@ export class EmployeeList extends LitElement {
 
   constructor() {
     super();
-    this.employees = [...EmployeeStore.employees];
+    this.employees = EmployeeStore.employees;
+    window.addEventListener('employee-updated', () => {
+      this.employees = [...EmployeeStore.employees];
+    });
   }
 
-  connectedCallback() {
-    super.connectedCallback();
-    window.addEventListener('employee-updated', this._refreshList);
-  }
-
-  disconnectedCallback() {
-    super.disconnectedCallback();
-    window.removeEventListener('employee-updated', this._refreshList);
-  }
-
-  _refreshList = () => {
-    this.employees = [...EmployeeStore.employees];
-  };
-
-  _deleteEmployee(id) {
-    EmployeeStore.deleteEmployee(id);
-    this._refreshList();
+  _delete(id) {
+    if (confirm('Are you sure you want to delete this employee?')) {
+      EmployeeStore.deleteEmployee(id);
+      this.employees = [...EmployeeStore.employees];
+    }
   }
 
   render() {
-    if (this.employees.length === 0) {
-      return html`<p>No employees found.</p>`;
-    }
-
     return html`
       <h2>Employee List</h2>
       <table>
         <thead>
           <tr>
-            <th>First</th>
-            <th>Last</th>
-            <th>Email</th>
+            <th>First Name</th>
+            <th>Last Name</th>
+            <th>Date of Employment</th>
+            <th>Date of Birth</th>
             <th>Phone</th>
-            <th>Dept.</th>
+            <th>Email</th>
+            <th>Department</th>
             <th>Position</th>
             <th>Actions</th>
           </tr>
@@ -86,14 +74,15 @@ export class EmployeeList extends LitElement {
               <tr>
                 <td>${emp.firstName}</td>
                 <td>${emp.lastName}</td>
-                <td>${emp.email}</td>
+                <td>${emp.dateOfEmployment}</td>
+                <td>${emp.dateOfBirth}</td>
                 <td>${emp.phone}</td>
+                <td>${emp.email}</td>
                 <td>${emp.department}</td>
                 <td>${emp.position}</td>
-                <td>
-                  <button @click=${() => this._deleteEmployee(emp.id)}>
-                    Delete
-                  </button>
+                <td class="actions">
+                  <button @click=${() => this._edit(emp)}>✏️</button>
+                  <button @click=${() => this._delete(emp.id)}>🗑️</button>
                 </td>
               </tr>
             `
@@ -101,6 +90,11 @@ export class EmployeeList extends LitElement {
         </tbody>
       </table>
     `;
+  }
+
+  _edit(emp) {
+    void emp; // Just to avoid ESLint warning for now
+    alert('Edit not implemented yet');
   }
 }
 
