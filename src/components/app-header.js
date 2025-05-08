@@ -7,7 +7,7 @@ export class AppHeader extends LitElement {
       justify-content: space-between;
       align-items: center;
       padding: 16px;
-      background-color: #f8f8f8;
+      background-color: white;
     }
 
     .logo {

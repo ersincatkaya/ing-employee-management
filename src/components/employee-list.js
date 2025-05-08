@@ -5,7 +5,7 @@ export class EmployeeList extends LitElement {
   static styles = css`
     :host {
       display: block;
-      max-width: 1200px;
+      max-width: 95%;
       margin: 2rem auto;
     }
 
@@ -164,7 +164,15 @@ export class EmployeeList extends LitElement {
                       />
                     </svg>
                   </button>
-                  <button class="icon-btn" @click=${() => this._delete(emp.id)}>
+                  <button
+                    class="icon-btn"
+                    @click=${() =>
+                      window.dispatchEvent(
+                        new CustomEvent('request-delete', {
+                          detail: emp,
+                        })
+                      )}
+                  >
                     <svg
                       viewBox="0 0 24 24"
                       fill="none"

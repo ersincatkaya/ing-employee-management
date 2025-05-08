@@ -1,9 +1,7 @@
-import './src/components/app-header.js';
-import './src/components/employee-dialog.js';
-import './src/components/employee-list.js';
+import './src/components/app-wrapper.js';
 
-document.getElementById('app').innerHTML = `
-  <app-header></app-header>
-  <employee-list></employee-list>
-  <employee-dialog></employee-dialog>
+const app = document.getElementById('app');
+
+app.innerHTML = `
+  <app-wrapper></app-wrapper>
 `;
