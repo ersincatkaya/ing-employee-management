@@ -1,5 +1,6 @@
 import {LitElement, html, css} from 'lit';
 import './employee-form.js';
+import {EmployeeStore} from '../store/EmployeeStore.js';
 
 export class EmployeeDialog extends LitElement {
   static properties = {
@@ -100,7 +101,9 @@ export class EmployeeDialog extends LitElement {
   render() {
     if (!this.open) return html``;
 
-    const isEdit = !!this.employee?.id;
+    const isEdit =
+      !!this.employee?.id &&
+      EmployeeStore.employees.some((emp) => emp.id === this.employee.id);
 
     return html`
       <div class="overlay" @click=${this._closeDialog}>

@@ -66,15 +66,47 @@ export class EmployeeList extends LitElement {
       height: 18px;
       stroke: #f60;
     }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+      gap: 16px;
+    }
+
+    .card {
+      background: white;
+      padding: 16px;
+      border-radius: 6px;
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .card h4 {
+      margin: 0 0 6px;
+      color: #333;
+    }
+
+    .card p {
+      margin: 2px 0;
+      font-size: 13px;
+    }
+
+    .card .actions {
+      margin-top: 10px;
+      justify-content: flex-end;
+    }
   `;
 
   static properties = {
     employees: {type: Array},
+    viewMode: {type: String},
+    language: {type: String},
   };
 
   constructor() {
     super();
     this.employees = EmployeeStore.employees;
+    this.viewMode = 'table';
+    this.language = 'en';
     window.addEventListener('employee-updated', () => {
       this.employees = [...EmployeeStore.employees];
     });
@@ -100,28 +132,19 @@ export class EmployeeList extends LitElement {
     );
   }
 
-  render() {
+  _toggleView() {
+    const newView = this.viewMode === 'table' ? 'grid' : 'table';
+    this.dispatchEvent(
+      new CustomEvent('toggle-view-mode', {
+        detail: newView,
+        bubbles: true,
+        composed: true,
+      })
+    );
+  }
+
+  renderTableView() {
     return html`
-      <h2>Employee List</h2>
-
-      <div class="toolbar">
-        <button class="icon-btn">
-          <svg
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-          >
-            <rect x="3" y="3" width="7" height="7" />
-            <rect x="14" y="3" width="7" height="7" />
-            <rect x="14" y="14" width="7" height="7" />
-            <rect x="3" y="14" width="7" height="7" />
-          </svg>
-        </button>
-      </div>
-
       <table>
         <thead>
           <tr>
@@ -152,35 +175,10 @@ export class EmployeeList extends LitElement {
                 <td>${emp.position}</td>
                 <td class="actions">
                   <button class="icon-btn" @click=${() => this._edit(emp)}>
-                    <svg
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      stroke-width="2"
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                    >
-                      <path d="M12 20h9" />
-                      <path
-                        d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z"
-                      />
-                    </svg>
+                    ✏️
                   </button>
                   <button class="icon-btn" @click=${() => this._delete(emp)}>
-                    <svg
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      stroke-width="2"
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                    >
-                      <polyline points="3 6 5 6 21 6" />
-                      <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" />
-                      <path d="M10 11v6" />
-                      <path d="M14 11v6" />
-                      <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2" />
-                    </svg>
+                    🗑️
                   </button>
                 </td>
               </tr>
@@ -188,6 +186,59 @@ export class EmployeeList extends LitElement {
           )}
         </tbody>
       </table>
+    `;
+  }
+
+  renderGridView() {
+    return html`
+      <div class="grid">
+        ${this.employees.map(
+          (emp) => html`
+            <div class="card">
+              <h4>${emp.firstName} ${emp.lastName}</h4>
+              <p>Phone: ${emp.phone}</p>
+              <p>Email: ${emp.email}</p>
+              <p>DOB: ${emp.dateOfBirth}</p>
+              <p>DOE: ${emp.dateOfEmployment}</p>
+              <p>${emp.department} / ${emp.position}</p>
+              <div class="actions">
+                <button class="icon-btn" @click=${() => this._edit(emp)}>
+                  ✏️
+                </button>
+                <button class="icon-btn" @click=${() => this._delete(emp)}>
+                  🗑️
+                </button>
+              </div>
+            </div>
+          `
+        )}
+      </div>
+    `;
+  }
+
+  render() {
+    return html`
+      <h2>${this.language === 'tr' ? 'Çalışan Listesi' : 'Employee List'}</h2>
+      <div class="toolbar">
+        <button class="icon-btn" @click=${this._toggleView}>
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <rect x="3" y="3" width="7" height="7" />
+            <rect x="14" y="3" width="7" height="7" />
+            <rect x="14" y="14" width="7" height="7" />
+            <rect x="3" y="14" width="7" height="7" />
+          </svg>
+        </button>
+      </div>
+      ${this.viewMode === 'table'
+        ? this.renderTableView()
+        : this.renderGridView()}
     `;
   }
 }
