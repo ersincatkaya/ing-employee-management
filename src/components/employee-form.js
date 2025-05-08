@@ -7,25 +7,38 @@ export class EmployeeForm extends LitElement {
       display: flex;
       flex-direction: column;
       gap: 10px;
-      max-width: 400px;
+      max-width: 100%;
     }
 
     input,
-    select,
-    button {
+    select {
       padding: 8px;
       font-size: 14px;
     }
 
-    button {
-      background-color: #007bff;
-      color: white;
-      border: none;
-      cursor: pointer;
+    .footer {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      margin-top: 20px;
     }
 
-    button:hover {
-      background-color: #0056b3;
+    button {
+      padding: 8px 14px;
+      font-size: 14px;
+      border: none;
+      cursor: pointer;
+      border-radius: 4px;
+    }
+
+    .cancel {
+      background-color: #e0e0e0;
+      color: #333;
+    }
+
+    .primary {
+      background-color: #ff6600;
+      color: white;
     }
   `;
 
@@ -35,23 +48,17 @@ export class EmployeeForm extends LitElement {
 
   constructor() {
     super();
-    // Default empty employee form
-    this.employee = {
-      id: Date.now(),
-      firstName: '',
-      lastName: '',
-      dateOfBirth: '',
-      dateOfEmployment: '',
-      phone: '',
-      email: '',
-      department: 'Analytics',
-      position: 'Junior',
-    };
+    this.employee = null;
+  }
+
+  updated(changedProps) {
+    if (changedProps.has('employee') && !this.employee) {
+      this.employee = this._createEmptyEmployee();
+    }
   }
 
   render() {
     return html`
-      <h2>${this.employee.id ? 'Edit' : 'Add'} Employee</h2>
       <form @submit=${this._handleSubmit}>
         <input
           type="text"
@@ -111,18 +118,21 @@ export class EmployeeForm extends LitElement {
           <option value="Senior">Senior</option>
         </select>
 
-        <button type="submit">
-          ${this.employee.id ? 'Update' : 'Add'} Employee
-        </button>
+        <div class="footer">
+          <button type="button" class="cancel" @click=${this._cancel}>
+            Cancel
+          </button>
+          <button type="submit" class="primary">
+            ${this.employee?.id ? 'Update' : 'Save'}
+          </button>
+        </div>
       </form>
     `;
   }
 
-  // Handle form submission
   _handleSubmit(e) {
     e.preventDefault();
 
-    // Check if the employee already exists (update)
     const exists = EmployeeStore.employees.some(
       (emp) => emp.id === this.employee.id
     );
@@ -132,8 +142,24 @@ export class EmployeeForm extends LitElement {
       EmployeeStore.addEmployee(this.employee);
     }
 
-    // Optional: Reset form
-    this.employee = {
+    window.dispatchEvent(new CustomEvent('employee-updated'));
+    this.dispatchEvent(
+      new CustomEvent('submit-done', {bubbles: true, composed: true})
+    );
+  }
+
+  _cancel() {
+    this.dispatchEvent(
+      new CustomEvent('cancel-form', {bubbles: true, composed: true})
+    );
+  }
+
+  submitForm() {
+    this.shadowRoot.querySelector('form').dispatchEvent(new Event('submit'));
+  }
+
+  _createEmptyEmployee() {
+    return {
       id: Date.now(),
       firstName: '',
       lastName: '',
@@ -144,10 +170,6 @@ export class EmployeeForm extends LitElement {
       department: 'Analytics',
       position: 'Junior',
     };
-    window.dispatchEvent(new CustomEvent('employee-updated'));
-    this.dispatchEvent(
-      new CustomEvent('submit-done', {bubbles: true, composed: true})
-    );
   }
 }
 
