@@ -80,11 +80,14 @@ export class EmployeeList extends LitElement {
     });
   }
 
-  _delete(id) {
-    if (confirm('Are you sure you want to delete this employee?')) {
-      EmployeeStore.deleteEmployee(id);
-      this.employees = [...EmployeeStore.employees];
-    }
+  _delete(emp) {
+    this.dispatchEvent(
+      new CustomEvent('request-delete', {
+        detail: emp,
+        bubbles: true,
+        composed: true,
+      })
+    );
   }
 
   _edit(emp) {
@@ -102,7 +105,6 @@ export class EmployeeList extends LitElement {
       <h2>Employee List</h2>
 
       <div class="toolbar">
-        <!-- Placeholder for table/grid toggle buttons -->
         <button class="icon-btn">
           <svg
             viewBox="0 0 24 24"
@@ -164,15 +166,7 @@ export class EmployeeList extends LitElement {
                       />
                     </svg>
                   </button>
-                  <button
-                    class="icon-btn"
-                    @click=${() =>
-                      window.dispatchEvent(
-                        new CustomEvent('request-delete', {
-                          detail: emp,
-                        })
-                      )}
-                  >
+                  <button class="icon-btn" @click=${() => this._delete(emp)}>
                     <svg
                       viewBox="0 0 24 24"
                       fill="none"

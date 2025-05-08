@@ -7,8 +7,8 @@ import './delete-dialog.js';
 export class AppWrapper extends LitElement {
   static properties = {
     title: {type: String},
-    showDelete: {type: Boolean},
-    deleteTarget: {type: Object},
+    showDeleteDialog: {type: Boolean},
+    employeeToDelete: {type: Object},
   };
 
   static styles = css`
@@ -32,8 +32,8 @@ export class AppWrapper extends LitElement {
   constructor() {
     super();
     this.title = 'Employee List (Table View)';
-    this.showDelete = false;
-    this.deleteTarget = null;
+    this.showDeleteDialog = false;
+    this.employeeToDelete = null;
   }
 
   connectedCallback() {
@@ -47,32 +47,42 @@ export class AppWrapper extends LitElement {
   }
 
   _onRequestDelete = (e) => {
-    this.deleteTarget = e.detail;
+    this.employeeToDelete = e.detail;
+    this.showDeleteDialog = true;
     this.title = 'Delete Confirmation';
-    this.showDelete = true;
   };
 
-  _onDeleteDone = () => {
+  _closeDeleteDialog = () => {
     this.title = 'Employee List (Table View)';
-    this.showDelete = false;
-    this.deleteTarget = null;
+    this.showDeleteDialog = false;
+    this.employeeToDelete = null;
+  };
+
+  _deleteConfirmed = (e) => {
+    const id = e.detail.id;
+    const event = new CustomEvent('delete-employee-final', {
+      detail: id,
+      bubbles: true,
+      composed: true,
+    });
+    this.dispatchEvent(event);
+    this._closeDeleteDialog();
   };
 
   render() {
     return html`
       <div class="header-note">${this.title}</div>
-      <div class="wrapper ${this.showDelete ? 'confirming' : ''}">
+      <div class="wrapper ${this.showDeleteDialog ? 'confirming' : ''}">
         <app-header></app-header>
         <employee-list></employee-list>
         <employee-dialog></employee-dialog>
       </div>
-      ${this.showDelete
-        ? html`<delete-dialog
-            .employee=${this.deleteTarget}
-            @confirm-delete=${this._onDeleteDone}
-            @cancel-delete=${this._onDeleteDone}
-          ></delete-dialog>`
-        : ''}
+      <delete-dialog
+        .open=${this.showDeleteDialog}
+        .employee=${this.employeeToDelete}
+        @cancel-delete=${this._closeDeleteDialog}
+        @confirm-delete=${this._deleteConfirmed}
+      ></delete-dialog>
     `;
   }
 }
