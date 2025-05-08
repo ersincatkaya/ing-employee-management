@@ -83,7 +83,11 @@ export class EmployeeDialog extends LitElement {
   };
 
   _onEdit = (e) => {
-    this.employee = e.detail;
+    const emp = e.detail;
+    if (!emp.id) {
+      emp.id = Date.now();
+    }
+    this.employee = {...emp};
     this.open = true;
   };
 
