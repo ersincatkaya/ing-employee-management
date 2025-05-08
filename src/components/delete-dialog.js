@@ -7,58 +7,53 @@ export class DeleteDialog extends LitElement {
   };
 
   static styles = css`
-    .overlay {
+    .dialog {
       position: fixed;
       top: 0;
       left: 0;
       width: 100vw;
       height: 100vh;
-      background-color: rgba(0, 0, 0, 0.3);
+      background-color: rgba(0, 0, 0, 0.4);
       display: flex;
       justify-content: center;
       align-items: center;
-      z-index: 1000;
+      z-index: 9999;
     }
 
-    .dialog {
+    .content {
       background: white;
       padding: 24px;
       border-radius: 8px;
       width: 300px;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
     }
 
-    .dialog h3 {
+    h3 {
       margin-top: 0;
-      font-size: 18px;
-      color: #ff6600;
+      color: #f56600;
     }
 
-    .dialog p {
-      font-size: 14px;
-      margin-bottom: 20px;
-    }
-
-    .actions {
+    .buttons {
       display: flex;
-      justify-content: flex-end;
-      gap: 12px;
+      justify-content: space-between;
+      margin-top: 20px;
     }
 
-    .cancel-btn {
-      background: #e0e0e0;
-      color: #333;
-      border: none;
-      padding: 8px 12px;
+    button {
+      padding: 8px 16px;
+      font-size: 14px;
       cursor: pointer;
+      border-radius: 4px;
+      border: none;
     }
 
-    .delete-btn {
-      background: #ff6600;
+    .cancel {
+      background-color: #eee;
+    }
+
+    .proceed {
+      background-color: #f56600;
       color: white;
-      border: none;
-      padding: 8px 12px;
-      cursor: pointer;
     }
   `;
 
@@ -66,33 +61,6 @@ export class DeleteDialog extends LitElement {
     super();
     this.open = false;
     this.employee = null;
-  }
-
-  render() {
-    if (!this.open || !this.employee) return html``;
-
-    return html`
-      <div class="overlay" @click=${this._cancel}>
-        <div class="dialog" @click=${(e) => e.stopPropagation()}>
-          <h3>Are you sure?</h3>
-          <p>
-            Selected Employee record of
-            <b>${this.employee.firstName} ${this.employee.lastName}</b> will be
-            deleted
-          </p>
-          <div class="actions">
-            <button class="cancel-btn" @click=${this._cancel}>Cancel</button>
-            <button class="delete-btn" @click=${this._confirm}>Proceed</button>
-          </div>
-        </div>
-      </div>
-    `;
-  }
-
-  _cancel() {
-    this.dispatchEvent(
-      new CustomEvent('cancel-delete', {bubbles: true, composed: true})
-    );
   }
 
   _confirm() {
@@ -103,6 +71,37 @@ export class DeleteDialog extends LitElement {
         composed: true,
       })
     );
+  }
+
+  _cancel() {
+    this.dispatchEvent(
+      new CustomEvent('cancel-delete', {
+        bubbles: true,
+        composed: true,
+      })
+    );
+  }
+
+  render() {
+    if (!this.open || !this.employee) return html``;
+    return html`
+      <div class="dialog" @click=${this._cancel}>
+        <div class="content" @click=${(e) => e.stopPropagation()}>
+          <h3>Are you sure?</h3>
+          <p>
+            Selected Employee record of
+            <strong
+              >${this.employee.firstName} ${this.employee.lastName}</strong
+            >
+            will be deleted
+          </p>
+          <div class="buttons">
+            <button class="cancel" @click=${this._cancel}>Cancel</button>
+            <button class="proceed" @click=${this._confirm}>Proceed</button>
+          </div>
+        </div>
+      </div>
+    `;
   }
 }
 
