@@ -1,6 +1,6 @@
 import {LitElement, html, css} from 'lit';
-import {EmployeeStore} from '../store/EmployeeStore.js';
 import {labels} from '../i18n/labels.js';
+import {EmployeeStore} from '../store/EmployeeStore.js';
 
 export class EmployeeList extends LitElement {
   static styles = css`
@@ -15,6 +15,29 @@ export class EmployeeList extends LitElement {
       font-weight: 600;
       font-size: 20px;
       margin-bottom: 20px;
+    }
+
+    .toolbar {
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+
+    .icon-btn {
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 4px;
+      display: flex;
+      align-items: center;
+      border-radius: 4px;
+      border: 2px solid transparent;
+    }
+
+    .icon-btn.active {
+      border-color: #f56600;
     }
 
     table {
@@ -47,21 +70,6 @@ export class EmployeeList extends LitElement {
       gap: 10px;
     }
 
-    .icon-btn {
-      background: none;
-      border: none;
-      cursor: pointer;
-      padding: 4px;
-      display: flex;
-      align-items: center;
-    }
-
-    svg {
-      width: 18px;
-      height: 18px;
-      stroke: #f60;
-    }
-
     .grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
@@ -88,6 +96,14 @@ export class EmployeeList extends LitElement {
     .card .actions {
       margin-top: 10px;
       justify-content: flex-end;
+    }
+
+    .icon {
+      width: 18px;
+      height: 18px;
+      stroke: #f60;
+      stroke-width: 2;
+      fill: none;
     }
   `;
 
@@ -130,11 +146,10 @@ export class EmployeeList extends LitElement {
     );
   }
 
-  _toggleView() {
-    const newView = this.viewMode === 'table' ? 'grid' : 'table';
+  _setView(mode) {
     this.dispatchEvent(
       new CustomEvent('toggle-view-mode', {
-        detail: newView,
+        detail: mode,
         bubbles: true,
         composed: true,
       })
@@ -173,10 +188,19 @@ export class EmployeeList extends LitElement {
                 <td>${emp.position}</td>
                 <td class="actions">
                   <button class="icon-btn" @click=${() => this._edit(emp)}>
-                    ✏️
+                    <svg class="icon" viewBox="0 0 24 24">
+                      <path
+                        d="M4 21h4l10.5-10.5a2.121 2.121 0 0 0-3-3L5 18v3z"
+                      />
+                    </svg>
                   </button>
                   <button class="icon-btn" @click=${() => this._delete(emp)}>
-                    🗑️
+                    <svg class="icon" viewBox="0 0 24 24">
+                      <path d="M3 6h18" />
+                      <path d="M8 6v-1a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v1" />
+                      <path d="M19 6l-1 14H6L5 6" />
+                      <path d="M10 11v6M14 11v6" />
+                    </svg>
                   </button>
                 </td>
               </tr>
@@ -201,10 +225,17 @@ export class EmployeeList extends LitElement {
               <p>${emp.department} / ${emp.position}</p>
               <div class="actions">
                 <button class="icon-btn" @click=${() => this._edit(emp)}>
-                  ✏️
+                  <svg class="icon" viewBox="0 0 24 24">
+                    <path d="M4 21h4l10.5-10.5a2.121 2.121 0 0 0-3-3L5 18v3z" />
+                  </svg>
                 </button>
                 <button class="icon-btn" @click=${() => this._delete(emp)}>
-                  🗑️
+                  <svg class="icon" viewBox="0 0 24 24">
+                    <path d="M3 6h18" />
+                    <path d="M8 6v-1a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v1" />
+                    <path d="M19 6l-1 14H6L5 6" />
+                    <path d="M10 11v6M14 11v6" />
+                  </svg>
                 </button>
               </div>
             </div>
@@ -218,7 +249,29 @@ export class EmployeeList extends LitElement {
     const t = labels[this.language] || labels.en;
     return html`
       <h2>${t.listTitle}</h2>
-
+      <div class="toolbar">
+        <button
+          class="icon-btn ${this.viewMode === 'table' ? 'active' : ''}"
+          @click=${() => this._setView('table')}
+          title="Table View"
+        >
+          <svg class="icon" viewBox="0 0 24 24">
+            <path d="M3 3h18v4H3zM3 10h18v4H3zM3 17h18v4H3z" />
+          </svg>
+        </button>
+        <button
+          class="icon-btn ${this.viewMode === 'grid' ? 'active' : ''}"
+          @click=${() => this._setView('grid')}
+          title="Grid View"
+        >
+          <svg class="icon" viewBox="0 0 24 24">
+            <rect x="3" y="3" width="6" height="6" />
+            <rect x="15" y="3" width="6" height="6" />
+            <rect x="15" y="15" width="6" height="6" />
+            <rect x="3" y="15" width="6" height="6" />
+          </svg>
+        </button>
+      </div>
       ${this.viewMode === 'table'
         ? this.renderTableView(t)
         : this.renderGridView(t)}
