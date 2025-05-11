@@ -19,6 +19,8 @@ export class AppHeader extends LitElement {
       padding: 0.75rem 0.5rem;
       background-color: white;
       margin: 0 1rem;
+      flex-wrap: wrap;
+      gap: 1rem;
     }
 
     .logo {
@@ -35,6 +37,7 @@ export class AppHeader extends LitElement {
       display: flex;
       align-items: center;
       gap: 24px;
+      flex-wrap: wrap;
     }
 
     .action {
@@ -59,6 +62,22 @@ export class AppHeader extends LitElement {
 
     .flag.active {
       border-color: #f56600;
+    }
+
+    @media (max-width: 480px) {
+      header {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .actions {
+        justify-content: flex-start;
+        gap: 12px;
+      }
+
+      .action {
+        font-size: 14px;
+      }
     }
   `;
 

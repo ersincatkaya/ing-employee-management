@@ -1,4 +1,5 @@
 import {LitElement, html, css} from 'lit';
+import {unsafeHTML} from 'lit/directives/unsafe-html.js';
 import {labels} from '../i18n/labels.js';
 
 export class DeleteDialog extends LitElement {
@@ -92,13 +93,13 @@ export class DeleteDialog extends LitElement {
     if (!this.open || !this.employee) return html``;
 
     const t = labels[this.language] || labels.en;
-    const name = `${this.employee.firstName} ${this.employee.lastName}`;
+    const name = `<strong>${this.employee.firstName} ${this.employee.lastName}</strong>`;
 
     return html`
       <div class="dialog" @click=${this._cancel}>
         <div class="content" @click=${(e) => e.stopPropagation()}>
           <h3>${t.areYouSure}</h3>
-          <p>${t.deleteMessage(name)}</p>
+          <p>${unsafeHTML(t.deleteMessage(name))}</p>
           <div class="buttons">
             <button class="cancel" @click=${this._cancel}>${t.cancel}</button>
             <button class="proceed" @click=${this._confirm}>

@@ -23,6 +23,7 @@ export class EmployeeList extends LitElement {
       align-items: center;
       gap: 10px;
       margin-bottom: 10px;
+      flex-wrap: wrap;
     }
 
     .icon-btn {
@@ -32,13 +33,13 @@ export class EmployeeList extends LitElement {
       padding: 4px;
       display: flex;
       align-items: center;
+      justify-content: center;
     }
 
     .icon-btn.active {
       border: 2px solid #f56600;
       padding: 2px;
       border-radius: 4px;
-      box-sizing: border-box;
     }
 
     .icon {
@@ -53,7 +54,7 @@ export class EmployeeList extends LitElement {
       border-collapse: collapse;
       background: white;
       border-radius: 6px;
-      overflow: hidden;
+      overflow: auto;
     }
 
     th,
@@ -112,13 +113,14 @@ export class EmployeeList extends LitElement {
       justify-content: center;
       gap: 8px;
       align-items: center;
+      flex-wrap: wrap;
     }
 
     .pagination button {
       background: none;
       border: 1px solid #ff6600;
       color: #ff6600;
-      padding: 6px 10px;
+      padding: 8px 14px;
       font-size: 14px;
       border-radius: 4px;
       cursor: pointer;
@@ -127,6 +129,43 @@ export class EmployeeList extends LitElement {
     .pagination button:disabled {
       opacity: 0.5;
       cursor: default;
+    }
+
+    @media (max-width: 768px) {
+      .grid {
+        grid-template-columns: repeat(auto-fill, minmax(100%, 1fr));
+      }
+
+      table {
+        display: block;
+        overflow-x: auto;
+        white-space: nowrap;
+        font-size: 12px;
+      }
+
+      th,
+      td {
+        padding: 6px;
+      }
+
+      h2 {
+        font-size: 16px;
+      }
+
+      input[type='text'] {
+        width: 100% !important;
+        margin-top: 0.5rem;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .card p {
+        font-size: 12px;
+      }
+
+      .card h4 {
+        font-size: 14px;
+      }
     }
   `;
 

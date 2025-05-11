@@ -48,6 +48,16 @@ export class AppWrapper extends LitElement {
       width: 100%;
       padding: 0 24px;
     }
+    @media (max-width: 768px) {
+      .content {
+        padding: 0 12px;
+      }
+
+      .header-note {
+        font-size: 10px;
+        padding: 4px 8px;
+      }
+    }
   `;
 
   constructor() {
