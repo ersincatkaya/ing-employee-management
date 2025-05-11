@@ -4,6 +4,7 @@ import './employee-list.js';
 import './employee-dialog.js';
 import './delete-dialog.js';
 import {EmployeeStore} from '../store/EmployeeStore.js';
+import {labels} from '../i18n/labels.js';
 
 export class AppWrapper extends LitElement {
   static properties = {
@@ -12,6 +13,7 @@ export class AppWrapper extends LitElement {
     employeeToDelete: {type: Object},
     employees: {type: Array},
     viewMode: {type: String},
+    language: {type: String},
   };
 
   static styles = css`
@@ -50,7 +52,8 @@ export class AppWrapper extends LitElement {
 
   constructor() {
     super();
-    this.title = 'Employee List (Table View)';
+    this.language = 'en';
+    this.title = labels[this.language].listTitle + ' (Table View)';
     this.showDeleteDialog = false;
     this.employeeToDelete = null;
     this.employees = EmployeeStore.employees;
@@ -62,23 +65,30 @@ export class AppWrapper extends LitElement {
     window.addEventListener('request-delete', this._onRequestDelete);
     window.addEventListener('delete-employee-final', this._onDeleteFinal);
     window.addEventListener('toggle-view-mode', this._onToggleView);
+    window.addEventListener('language-changed', this._onLanguageChange);
   }
 
   disconnectedCallback() {
     window.removeEventListener('request-delete', this._onRequestDelete);
     window.removeEventListener('delete-employee-final', this._onDeleteFinal);
     window.removeEventListener('toggle-view-mode', this._onToggleView);
+    window.removeEventListener('language-changed', this._onLanguageChange);
     super.disconnectedCallback();
   }
+
+  _onLanguageChange = (e) => {
+    this.language = e.detail;
+    this._updateTitle();
+  };
 
   _onRequestDelete = (e) => {
     this.employeeToDelete = e.detail;
     this.showDeleteDialog = true;
-    this.title = 'Delete Confirmation';
+    this.title = this.language === 'tr' ? 'Silme Onayı' : 'Delete Confirmation';
   };
 
   _closeDeleteDialog = () => {
-    this.title = 'Employee List (Table View)';
+    this._updateTitle();
     this.showDeleteDialog = false;
     this.employeeToDelete = null;
   };
@@ -102,27 +112,33 @@ export class AppWrapper extends LitElement {
 
   _onToggleView = (e) => {
     this.viewMode = e.detail;
-    this.title =
-      this.viewMode === 'grid'
-        ? 'Employee List (Grid View)'
-        : 'Employee List (Table View)';
+    this._updateTitle();
   };
+
+  _updateTitle() {
+    const t = labels[this.language] || labels.en;
+    this.title = `${t.listTitle} (${
+      this.viewMode === 'grid' ? 'Grid View' : 'Table View'
+    })`;
+  }
 
   render() {
     return html`
       <div class="header-note">${this.title}</div>
-      <app-header></app-header>
+      <app-header .language=${this.language}></app-header>
       <div class="wrapper ${this.showDeleteDialog ? 'confirming' : ''}">
         <div class="content">
           <employee-list
             .employees=${this.employees}
             .viewMode=${this.viewMode}
+            .language=${this.language}
           ></employee-list>
         </div>
         <employee-dialog></employee-dialog>
         <delete-dialog
           .open=${this.showDeleteDialog}
           .employee=${this.employeeToDelete}
+          .language=${this.language}
           @cancel-delete=${this._closeDeleteDialog}
           @confirm-delete=${this._deleteConfirmed}
         ></delete-dialog>

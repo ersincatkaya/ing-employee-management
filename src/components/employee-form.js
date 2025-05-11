@@ -1,5 +1,6 @@
 import {LitElement, html, css} from 'lit';
 import {EmployeeStore} from '../store/EmployeeStore.js';
+import {labels} from '../i18n/labels.js';
 
 export class EmployeeForm extends LitElement {
   static styles = css`
@@ -44,11 +45,16 @@ export class EmployeeForm extends LitElement {
 
   static properties = {
     employee: {type: Object},
+    language: {type: String},
   };
 
   constructor() {
     super();
     this.employee = null;
+    this.language = 'en';
+    window.addEventListener('language-changed', (e) => {
+      this.language = e.detail;
+    });
   }
 
   updated(changedProps) {
@@ -58,19 +64,20 @@ export class EmployeeForm extends LitElement {
   }
 
   render() {
+    const t = labels[this.language] || labels.en;
     return html`
       <form @submit=${this._handleSubmit}>
         <input
           type="text"
           .value=${this.employee.firstName}
-          placeholder="First Name"
+          placeholder="${t.firstName}"
           required
           @input=${(e) => (this.employee.firstName = e.target.value)}
         />
         <input
           type="text"
           .value=${this.employee.lastName}
-          placeholder="Last Name"
+          placeholder="${t.lastName}"
           required
           @input=${(e) => (this.employee.lastName = e.target.value)}
         />
@@ -89,14 +96,14 @@ export class EmployeeForm extends LitElement {
         <input
           type="tel"
           .value=${this.employee.phone}
-          placeholder="Phone"
+          placeholder="${t.phone}"
           required
           @input=${(e) => (this.employee.phone = e.target.value)}
         />
         <input
           type="email"
           .value=${this.employee.email}
-          placeholder="Email"
+          placeholder="${t.email}"
           required
           @input=${(e) => (this.employee.email = e.target.value)}
         />
@@ -120,10 +127,10 @@ export class EmployeeForm extends LitElement {
 
         <div class="footer">
           <button type="button" class="cancel" @click=${this._cancel}>
-            Cancel
+            ${t.cancel}
           </button>
           <button type="submit" class="primary">
-            ${this.employee?.id ? 'Update' : 'Save'}
+            ${this.employee?.id ? t.update : t.save}
           </button>
         </div>
       </form>

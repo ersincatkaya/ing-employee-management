@@ -1,11 +1,13 @@
 import {LitElement, html, css} from 'lit';
 import './employee-form.js';
 import {EmployeeStore} from '../store/EmployeeStore.js';
+import {labels} from '../i18n/labels.js';
 
 export class EmployeeDialog extends LitElement {
   static properties = {
     open: {type: Boolean},
     employee: {type: Object},
+    language: {type: String},
   };
 
   static styles = css`
@@ -54,6 +56,10 @@ export class EmployeeDialog extends LitElement {
     super();
     this.open = false;
     this.employee = null;
+    this.language = 'en';
+    window.addEventListener('language-changed', (e) => {
+      this.language = e.detail;
+    });
   }
 
   connectedCallback() {
@@ -101,6 +107,7 @@ export class EmployeeDialog extends LitElement {
   render() {
     if (!this.open) return html``;
 
+    const t = labels[this.language] || labels.en;
     const isEdit =
       !!this.employee?.id &&
       EmployeeStore.employees.some((emp) => emp.id === this.employee.id);
@@ -109,7 +116,7 @@ export class EmployeeDialog extends LitElement {
       <div class="overlay" @click=${this._closeDialog}>
         <div class="dialog" @click=${(e) => e.stopPropagation()}>
           <div class="header">
-            <h3>${isEdit ? 'Edit Employee' : 'Add New Employee'}</h3>
+            <h3>${isEdit ? t.editTitle : t.addTitle}</h3>
             <button class="close-btn" @click=${this._closeDialog}>
               &times;
             </button>
@@ -117,6 +124,7 @@ export class EmployeeDialog extends LitElement {
           <employee-form
             .employee=${this.employee}
             .mode=${isEdit ? 'edit' : 'add'}
+            .language=${this.language}
             @submit-done=${this._closeDialog}
             @cancel-form=${this._closeDialog}
           ></employee-form>

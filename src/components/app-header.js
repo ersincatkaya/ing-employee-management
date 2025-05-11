@@ -1,6 +1,16 @@
 import {LitElement, html, css} from 'lit';
+import {labels} from '../i18n/labels.js';
 
 export class AppHeader extends LitElement {
+  static properties = {
+    language: {type: String},
+  };
+
+  constructor() {
+    super();
+    this.language = 'en';
+  }
+
   static styles = css`
     header {
       display: flex;
@@ -44,10 +54,17 @@ export class AppHeader extends LitElement {
       width: 24px;
       height: 16px;
       cursor: pointer;
+      border: 2px solid transparent;
+    }
+
+    .flag.active {
+      border-color: #f56600;
     }
   `;
 
   render() {
+    const t = labels[this.language] || labels.en;
+
     return html`
       <header>
         <div class="logo">
@@ -70,14 +87,24 @@ export class AppHeader extends LitElement {
               <path d="M4 21v-2a4 4 0 0 1 3-3.87" />
               <circle cx="12" cy="7" r="4" />
             </svg>
-            <span>Employees</span>
+            <span>${t.employees}</span>
           </div>
           <div class="action" @click=${this._openDialog}>
             <span>+</span>
-            <span>Add New</span>
+            <span>${t.addNew}</span>
           </div>
-          <img class="flag" src="/public/assets/tr-flag.png" alt="TR" />
-          <img class="flag" src="/public/assets/en-flag.png" alt="EN" />
+          <img
+            class="flag ${this.language === 'en' ? 'active' : ''}"
+            src="/public/assets/en-flag.png"
+            alt="EN"
+            @click=${() => this._setLanguage('en')}
+          />
+          <img
+            class="flag ${this.language === 'tr' ? 'active' : ''}"
+            src="/public/assets/tr-flag.png"
+            alt="TR"
+            @click=${() => this._setLanguage('tr')}
+          />
         </div>
       </header>
     `;
@@ -85,6 +112,11 @@ export class AppHeader extends LitElement {
 
   _openDialog() {
     window.dispatchEvent(new CustomEvent('open-employee-dialog'));
+  }
+
+  _setLanguage(lang) {
+    this.language = lang;
+    window.dispatchEvent(new CustomEvent('language-changed', {detail: lang}));
   }
 }
 

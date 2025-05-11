@@ -1,9 +1,11 @@
 import {LitElement, html, css} from 'lit';
+import {labels} from '../i18n/labels.js';
 
 export class DeleteDialog extends LitElement {
   static properties = {
     open: {type: Boolean},
     employee: {type: Object},
+    language: {type: String},
   };
 
   static styles = css`
@@ -61,6 +63,10 @@ export class DeleteDialog extends LitElement {
     super();
     this.open = false;
     this.employee = null;
+    this.language = 'en';
+    window.addEventListener('language-changed', (e) => {
+      this.language = e.detail;
+    });
   }
 
   _confirm() {
@@ -84,20 +90,20 @@ export class DeleteDialog extends LitElement {
 
   render() {
     if (!this.open || !this.employee) return html``;
+
+    const t = labels[this.language] || labels.en;
+    const name = `${this.employee.firstName} ${this.employee.lastName}`;
+
     return html`
       <div class="dialog" @click=${this._cancel}>
         <div class="content" @click=${(e) => e.stopPropagation()}>
-          <h3>Are you sure?</h3>
-          <p>
-            Selected Employee record of
-            <strong
-              >${this.employee.firstName} ${this.employee.lastName}</strong
-            >
-            will be deleted
-          </p>
+          <h3>${t.areYouSure}</h3>
+          <p>${t.deleteMessage(name)}</p>
           <div class="buttons">
-            <button class="cancel" @click=${this._cancel}>Cancel</button>
-            <button class="proceed" @click=${this._confirm}>Proceed</button>
+            <button class="cancel" @click=${this._cancel}>${t.cancel}</button>
+            <button class="proceed" @click=${this._confirm}>
+              ${t.proceed}
+            </button>
           </div>
         </div>
       </div>

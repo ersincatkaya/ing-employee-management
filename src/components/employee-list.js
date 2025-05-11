@@ -1,5 +1,6 @@
 import {LitElement, html, css} from 'lit';
 import {EmployeeStore} from '../store/EmployeeStore.js';
+import {labels} from '../i18n/labels.js';
 
 export class EmployeeList extends LitElement {
   static styles = css`
@@ -14,12 +15,6 @@ export class EmployeeList extends LitElement {
       font-weight: 600;
       font-size: 20px;
       margin-bottom: 20px;
-    }
-
-    .toolbar {
-      display: flex;
-      justify-content: flex-end;
-      margin-bottom: 10px;
     }
 
     table {
@@ -110,6 +105,9 @@ export class EmployeeList extends LitElement {
     window.addEventListener('employee-updated', () => {
       this.employees = [...EmployeeStore.employees];
     });
+    window.addEventListener('language-changed', (e) => {
+      this.language = e.detail;
+    });
   }
 
   _delete(emp) {
@@ -143,21 +141,21 @@ export class EmployeeList extends LitElement {
     );
   }
 
-  renderTableView() {
+  renderTableView(t) {
     return html`
       <table>
         <thead>
           <tr>
             <th><input type="checkbox" /></th>
-            <th>First Name</th>
-            <th>Last Name</th>
-            <th>Date of Employment</th>
-            <th>Date of Birth</th>
-            <th>Phone</th>
-            <th>Email</th>
-            <th>Department</th>
-            <th>Position</th>
-            <th>Actions</th>
+            <th>${t.firstName}</th>
+            <th>${t.lastName}</th>
+            <th>${t.employmentDate}</th>
+            <th>${t.birthDate}</th>
+            <th>${t.phone}</th>
+            <th>${t.email}</th>
+            <th>${t.department}</th>
+            <th>${t.position}</th>
+            <th>${t.actions}</th>
           </tr>
         </thead>
         <tbody>
@@ -189,17 +187,17 @@ export class EmployeeList extends LitElement {
     `;
   }
 
-  renderGridView() {
+  renderGridView(t) {
     return html`
       <div class="grid">
         ${this.employees.map(
           (emp) => html`
             <div class="card">
               <h4>${emp.firstName} ${emp.lastName}</h4>
-              <p>Phone: ${emp.phone}</p>
-              <p>Email: ${emp.email}</p>
-              <p>DOB: ${emp.dateOfBirth}</p>
-              <p>DOE: ${emp.dateOfEmployment}</p>
+              <p>${t.phone}: ${emp.phone}</p>
+              <p>${t.email}: ${emp.email}</p>
+              <p>${t.birthDate}: ${emp.dateOfBirth}</p>
+              <p>${t.employmentDate}: ${emp.dateOfEmployment}</p>
               <p>${emp.department} / ${emp.position}</p>
               <div class="actions">
                 <button class="icon-btn" @click=${() => this._edit(emp)}>
@@ -217,28 +215,13 @@ export class EmployeeList extends LitElement {
   }
 
   render() {
+    const t = labels[this.language] || labels.en;
     return html`
-      <h2>${this.language === 'tr' ? 'Çalışan Listesi' : 'Employee List'}</h2>
-      <div class="toolbar">
-        <button class="icon-btn" @click=${this._toggleView}>
-          <svg
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-          >
-            <rect x="3" y="3" width="7" height="7" />
-            <rect x="14" y="3" width="7" height="7" />
-            <rect x="14" y="14" width="7" height="7" />
-            <rect x="3" y="14" width="7" height="7" />
-          </svg>
-        </button>
-      </div>
+      <h2>${t.listTitle}</h2>
+
       ${this.viewMode === 'table'
-        ? this.renderTableView()
-        : this.renderGridView()}
+        ? this.renderTableView(t)
+        : this.renderGridView(t)}
     `;
   }
 }
