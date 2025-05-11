@@ -186,6 +186,8 @@ export class EmployeeList extends LitElement {
     this.currentPage = 1;
     this.pageSize = 8;
     this.searchTerm = '';
+    this._searchDebounceTimer = null;
+    this.debounceDelay = 2000;
 
     window.addEventListener('employee-updated', () => {
       this.employees = [...EmployeeStore.employees];
@@ -263,10 +265,6 @@ export class EmployeeList extends LitElement {
     );
   }
 
-  _onSearch(e) {
-    this.searchTerm = e.target.value;
-  }
-
   renderTableView(t) {
     return html`
       <table>
@@ -320,6 +318,13 @@ export class EmployeeList extends LitElement {
         </tbody>
       </table>
     `;
+  }
+  _onSearch(e) {
+    clearTimeout(this._searchDebounceTimer);
+    const value = e.target.value;
+    this._searchDebounceTimer = setTimeout(() => {
+      this.searchTerm = value;
+    }, this.debounceDelay);
   }
 
   renderGridView(t) {

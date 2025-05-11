@@ -87,7 +87,7 @@ export class AppHeader extends LitElement {
     return html`
       <header>
         <div class="logo">
-          <img src="/assets/ing.jpg" alt="Logo" />
+          <img src="/public/assets/ing.jpg" alt="Logo" />
           <strong>ING</strong>
         </div>
         <div class="actions">
@@ -114,13 +114,13 @@ export class AppHeader extends LitElement {
           </div>
           <img
             class="flag ${this.language === 'en' ? 'active' : ''}"
-            src="/assets/en-flag.png"
+            src="/public/assets/en-flag.png"
             alt="EN"
             @click=${() => this._setLanguage('en')}
           />
           <img
             class="flag ${this.language === 'tr' ? 'active' : ''}"
-            src="/assets/tr-flag.png"
+            src="/public/assets/tr-flag.png"
             alt="TR"
             @click=${() => this._setLanguage('tr')}
           />

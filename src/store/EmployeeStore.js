@@ -31,5 +31,4 @@ export const EmployeeStore = {
   },
 };
 
-// Load immediately
 EmployeeStore.loadFromStorage();
