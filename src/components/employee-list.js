@@ -70,6 +70,21 @@ export class EmployeeList extends LitElement {
       gap: 10px;
     }
 
+    .icon-btn {
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 4px;
+      display: flex;
+      align-items: center;
+    }
+
+    svg {
+      width: 18px;
+      height: 18px;
+      stroke: #f60;
+    }
+
     .grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
@@ -105,12 +120,37 @@ export class EmployeeList extends LitElement {
       stroke-width: 2;
       fill: none;
     }
+
+    .pagination {
+      margin-top: 16px;
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .pagination button {
+      background: none;
+      border: 1px solid #ff6600;
+      color: #ff6600;
+      padding: 6px 10px;
+      font-size: 14px;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    .pagination button:disabled {
+      opacity: 0.5;
+      cursor: default;
+    }
   `;
 
   static properties = {
     employees: {type: Array},
     viewMode: {type: String},
     language: {type: String},
+    currentPage: {type: Number},
+    pageSize: {type: Number},
   };
 
   constructor() {
@@ -118,12 +158,33 @@ export class EmployeeList extends LitElement {
     this.employees = EmployeeStore.employees;
     this.viewMode = 'table';
     this.language = 'en';
+    this.currentPage = 1;
+    this.pageSize = 8;
+
     window.addEventListener('employee-updated', () => {
       this.employees = [...EmployeeStore.employees];
     });
     window.addEventListener('language-changed', (e) => {
       this.language = e.detail;
     });
+  }
+
+  get paginatedEmployees() {
+    const start = (this.currentPage - 1) * this.pageSize;
+    const end = start + this.pageSize;
+    return this.employees.slice(start, end);
+  }
+
+  get totalPages() {
+    return Math.ceil(this.employees.length / this.pageSize);
+  }
+
+  _prevPage() {
+    if (this.currentPage > 1) this.currentPage--;
+  }
+
+  _nextPage() {
+    if (this.currentPage < this.totalPages) this.currentPage++;
   }
 
   _delete(emp) {
@@ -174,7 +235,7 @@ export class EmployeeList extends LitElement {
           </tr>
         </thead>
         <tbody>
-          ${this.employees.map(
+          ${this.paginatedEmployees.map(
             (emp) => html`
               <tr>
                 <td><input type="checkbox" /></td>
@@ -214,7 +275,7 @@ export class EmployeeList extends LitElement {
   renderGridView(t) {
     return html`
       <div class="grid">
-        ${this.employees.map(
+        ${this.paginatedEmployees.map(
           (emp) => html`
             <div class="card">
               <h4>${emp.firstName} ${emp.lastName}</h4>
@@ -275,6 +336,19 @@ export class EmployeeList extends LitElement {
       ${this.viewMode === 'table'
         ? this.renderTableView(t)
         : this.renderGridView(t)}
+
+      <div class="pagination">
+        <button ?disabled=${this.currentPage === 1} @click=${this._prevPage}>
+          ‹
+        </button>
+        <span>${this.currentPage}</span>
+        <button
+          ?disabled=${this.currentPage >= this.totalPages}
+          @click=${this._nextPage}
+        >
+          ›
+        </button>
+      </div>
     `;
   }
 }
