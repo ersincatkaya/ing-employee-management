@@ -130,8 +130,8 @@ export class EmployeeDialog extends LitElement {
             .employee=${this.employee}
             .mode=${'add'}
             .language=${this.language}
-            @submit-done=${() => Router.go('/list')}
-            @cancel-form=${() => Router.go('/list')}
+            @submit-done=${() => Router.go('/')}
+            @cancel-form=${() => Router.go('/')}
           ></employee-form>
         </div>
       `;

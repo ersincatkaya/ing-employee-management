@@ -1,12 +1,22 @@
 import {Router} from '@vaadin/router';
+import '../src/components/app-wrapper.js';
+import '../src/components/employee-dialog.js';
+import '../src/components/not-found.js';
 
 export function initRouter(outlet) {
   const router = new Router(outlet);
-
   router.setRoutes([
-    {path: '/', redirect: '/list'},
-    {path: '/list', component: 'app-wrapper'},
-    {path: '/add', component: 'employee-dialog'},
-    {path: '/edit/:id', component: 'employee-dialog'},
+    {
+      path: '/',
+      component: 'app-wrapper',
+    },
+    {
+      path: '/add',
+      component: 'employee-dialog',
+    },
+    {
+      path: '(.*)',
+      component: 'not-found-page',
+    },
   ]);
 }
