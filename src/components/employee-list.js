@@ -32,12 +32,20 @@ export class EmployeeList extends LitElement {
       padding: 4px;
       display: flex;
       align-items: center;
-      border-radius: 4px;
-      border: 2px solid transparent;
     }
 
     .icon-btn.active {
-      border-color: #f56600;
+      border: 2px solid #f56600;
+      padding: 2px;
+      border-radius: 4px;
+      box-sizing: border-box;
+    }
+
+    .icon {
+      width: 18px;
+      height: 18px;
+      stroke: #f56600;
+      fill: #f56600;
     }
 
     table {
@@ -70,21 +78,6 @@ export class EmployeeList extends LitElement {
       gap: 10px;
     }
 
-    .icon-btn {
-      background: none;
-      border: none;
-      cursor: pointer;
-      padding: 4px;
-      display: flex;
-      align-items: center;
-    }
-
-    svg {
-      width: 18px;
-      height: 18px;
-      stroke: #f60;
-    }
-
     .grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
@@ -111,14 +104,6 @@ export class EmployeeList extends LitElement {
     .card .actions {
       margin-top: 10px;
       justify-content: flex-end;
-    }
-
-    .icon {
-      width: 18px;
-      height: 18px;
-      stroke: #f60;
-      stroke-width: 2;
-      fill: none;
     }
 
     .pagination {

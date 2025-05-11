@@ -20,6 +20,11 @@ export class AppWrapper extends LitElement {
     :host {
       display: block;
       background-color: #f8f8f8;
+      border: 2px solid transparent;
+    }
+
+    :host(.confirming) {
+      border-color: #007bff;
     }
 
     .header-note {
@@ -37,11 +42,6 @@ export class AppWrapper extends LitElement {
       display: flex;
       flex-direction: column;
       align-items: center;
-      border: 2px solid transparent;
-    }
-
-    .wrapper.confirming {
-      border-color: #007bff;
     }
 
     .content {
@@ -85,12 +85,14 @@ export class AppWrapper extends LitElement {
     this.employeeToDelete = e.detail;
     this.showDeleteDialog = true;
     this.title = this.language === 'tr' ? 'Silme Onayı' : 'Delete Confirmation';
+    this.classList.add('confirming');
   };
 
   _closeDeleteDialog = () => {
     this._updateTitle();
     this.showDeleteDialog = false;
     this.employeeToDelete = null;
+    this.classList.remove('confirming');
   };
 
   _deleteConfirmed = (e) => {
@@ -126,7 +128,7 @@ export class AppWrapper extends LitElement {
     return html`
       <div class="header-note">${this.title}</div>
       <app-header .language=${this.language}></app-header>
-      <div class="wrapper ${this.showDeleteDialog ? 'confirming' : ''}">
+      <div class="wrapper">
         <div class="content">
           <employee-list
             .employees=${this.employees}
