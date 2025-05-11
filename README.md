@@ -73,4 +73,4 @@ Open a Pull Request
 
 📞 Contact
 Ersin Çatkaya - catkayaersin@gmail.com
-Project Link: https://github.com/yourusername/employee-management-app
+Project Link: https://github.com/ersincatkaya/ing-employee-management
