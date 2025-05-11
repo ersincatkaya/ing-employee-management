@@ -136,6 +136,7 @@ export class EmployeeList extends LitElement {
     language: {type: String},
     currentPage: {type: Number},
     pageSize: {type: Number},
+    searchTerm: {type: String},
   };
 
   constructor() {
@@ -145,6 +146,7 @@ export class EmployeeList extends LitElement {
     this.language = 'en';
     this.currentPage = 1;
     this.pageSize = 8;
+    this.searchTerm = '';
 
     window.addEventListener('employee-updated', () => {
       this.employees = [...EmployeeStore.employees];
@@ -155,13 +157,33 @@ export class EmployeeList extends LitElement {
   }
 
   get paginatedEmployees() {
+    const filtered = this.employees.filter((emp) => {
+      const q = this.searchTerm.toLowerCase();
+      return (
+        emp.firstName.toLowerCase().includes(q) ||
+        emp.lastName.toLowerCase().includes(q) ||
+        emp.email.toLowerCase().includes(q) ||
+        emp.position.toLowerCase().includes(q) ||
+        emp.department.toLowerCase().includes(q)
+      );
+    });
     const start = (this.currentPage - 1) * this.pageSize;
     const end = start + this.pageSize;
-    return this.employees.slice(start, end);
+    return filtered.slice(start, end);
   }
 
   get totalPages() {
-    return Math.ceil(this.employees.length / this.pageSize);
+    const filtered = this.employees.filter((emp) => {
+      const q = this.searchTerm.toLowerCase();
+      return (
+        emp.firstName.toLowerCase().includes(q) ||
+        emp.lastName.toLowerCase().includes(q) ||
+        emp.email.toLowerCase().includes(q) ||
+        emp.position.toLowerCase().includes(q) ||
+        emp.department.toLowerCase().includes(q)
+      );
+    });
+    return Math.ceil(filtered.length / this.pageSize);
   }
 
   _prevPage() {
@@ -200,6 +222,10 @@ export class EmployeeList extends LitElement {
         composed: true,
       })
     );
+  }
+
+  _onSearch(e) {
+    this.searchTerm = e.target.value;
   }
 
   renderTableView(t) {
@@ -295,6 +321,16 @@ export class EmployeeList extends LitElement {
     const t = labels[this.language] || labels.en;
     return html`
       <h2>${t.listTitle}</h2>
+      <div
+        style="display: flex; justify-content: flex-end; margin-bottom: 1rem;"
+      >
+        <input
+          type="text"
+          placeholder="${t.searchPlaceholder || 'Search...'}"
+          @input=${this._onSearch}
+          style="padding: 8px; width: 200px; border: 1px solid #ccc; border-radius: 4px;"
+        />
+      </div>
       <div class="toolbar">
         <button
           class="icon-btn ${this.viewMode === 'table' ? 'active' : ''}"

@@ -19,6 +19,7 @@ export const labels = {
     deleteMessage: (name) =>
       `Selected Employee record of ${name} will be deleted`,
     proceed: 'Proceed',
+    searchPlaceholder: 'Search by name, email or position...',
   },
   tr: {
     listTitle: 'Çalışan Listesi',
@@ -39,5 +40,6 @@ export const labels = {
     areYouSure: 'Emin misiniz?',
     deleteMessage: (name) => `${name} isimli çalışanın kaydı silinecek`,
     proceed: 'Onayla',
+    searchPlaceholder: 'İsim, e-posta veya pozisyona göre ara...',
   },
 };

@@ -116,7 +116,7 @@ export class EmployeeDialog extends LitElement {
       <div class="overlay" @click=${this._closeDialog}>
         <div class="dialog" @click=${(e) => e.stopPropagation()}>
           <div class="header">
-            <h3>${isEdit ? t.editTitle : t.addTitle}</h3>
+            <h3>${isEdit ? t.update : t.addNew}</h3>
             <button class="close-btn" @click=${this._closeDialog}>
               &times;
             </button>
