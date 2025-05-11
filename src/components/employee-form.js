@@ -156,7 +156,7 @@ export class EmployeeForm extends LitElement {
     if (isEdit) {
       EmployeeStore.updateEmployee(this.employee);
     } else {
-      this.employee.id = Date.now(); // id oluşturulmadıysa oluştur
+      this.employee.id = Date.now();
       EmployeeStore.addEmployee(this.employee);
     }
 
