@@ -2,6 +2,7 @@ import {LitElement, html, css} from 'lit';
 import './employee-form.js';
 import {EmployeeStore} from '../store/EmployeeStore.js';
 import {labels} from '../i18n/labels.js';
+import {Router} from '@vaadin/router';
 
 export class EmployeeDialog extends LitElement {
   static properties = {
@@ -57,6 +58,7 @@ export class EmployeeDialog extends LitElement {
     this.open = false;
     this.employee = null;
     this.language = 'en';
+    this.isPageMode = window.location.pathname === '/add';
     window.addEventListener('language-changed', (e) => {
       this.language = e.detail;
     });
@@ -64,28 +66,24 @@ export class EmployeeDialog extends LitElement {
 
   connectedCallback() {
     super.connectedCallback();
-    window.addEventListener('open-employee-dialog', this._onAdd);
-    window.addEventListener('edit-employee', this._onEdit);
+    if (this.isPageMode) {
+      this.employee = this._createEmptyEmployee();
+    } else {
+      window.addEventListener('open-employee-dialog', this._onAdd);
+      window.addEventListener('edit-employee', this._onEdit);
+    }
   }
 
   disconnectedCallback() {
-    window.removeEventListener('open-employee-dialog', this._onAdd);
-    window.removeEventListener('edit-employee', this._onEdit);
+    if (!this.isPageMode) {
+      window.removeEventListener('open-employee-dialog', this._onAdd);
+      window.removeEventListener('edit-employee', this._onEdit);
+    }
     super.disconnectedCallback();
   }
 
   _onAdd = () => {
-    this.employee = {
-      id: null,
-      firstName: '',
-      lastName: '',
-      dateOfBirth: '',
-      dateOfEmployment: '',
-      phone: '',
-      email: '',
-      department: 'Analytics',
-      position: 'Junior',
-    };
+    this.employee = this._createEmptyEmployee();
     this.open = true;
   };
 
@@ -104,19 +102,48 @@ export class EmployeeDialog extends LitElement {
     this.dispatchEvent(new CustomEvent('close-dialog'));
   }
 
-  render() {
-    if (!this.open) return html``;
+  _createEmptyEmployee() {
+    return {
+      id: null,
+      firstName: '',
+      lastName: '',
+      dateOfBirth: '',
+      dateOfEmployment: '',
+      phone: '',
+      email: '',
+      department: 'Analytics',
+      position: 'Junior',
+    };
+  }
 
+  render() {
     const t = labels[this.language] || labels.en;
     const isEdit =
       !!this.employee?.id &&
       EmployeeStore.employees.some((emp) => emp.id === this.employee.id);
 
+    if (this.isPageMode) {
+      return html`
+        <div style="padding: 2rem">
+          <h3>${t.addTitle}</h3>
+          <employee-form
+            .employee=${this.employee}
+            .mode=${'add'}
+            .language=${this.language}
+            @submit-done=${() => Router.go('/list')}
+            @cancel-form=${() => Router.go('/list')}
+          ></employee-form>
+        </div>
+      `;
+    }
+
+    if (!this.open) return html``;
+
     return html`
       <div class="overlay" @click=${this._closeDialog}>
         <div class="dialog" @click=${(e) => e.stopPropagation()}>
           <div class="header">
-            <h3>${isEdit ? t.update : t.addNew}</h3>
+            <h3>${isEdit ? t.editTitle : t.addTitle}</h3>
             <button class="close-btn" @click=${this._closeDialog}>
               &times;
             </button>

@@ -120,7 +120,7 @@ export class AppWrapper extends LitElement {
   _updateTitle() {
     const t = labels[this.language] || labels.en;
     this.title = `${t.listTitle} (${
-      this.viewMode === 'grid' ? 'Grid View' : 'Table View'
+      this.viewMode === 'grid' ? t.gridView : t.tableView
     })`;
   }
 

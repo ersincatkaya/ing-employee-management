@@ -140,12 +140,23 @@ export class EmployeeForm extends LitElement {
   _handleSubmit(e) {
     e.preventDefault();
 
-    const exists = EmployeeStore.employees.some(
-      (emp) => emp.id === this.employee.id
+    const isEdit = !!this.employee?.id;
+
+    const duplicate = EmployeeStore.employees.some(
+      (emp) =>
+        emp.id !== this.employee.id &&
+        (emp.email === this.employee.email || emp.phone === this.employee.phone)
     );
-    if (exists) {
+
+    if (duplicate) {
+      alert('An employee with the same email or phone number already exists.');
+      return;
+    }
+
+    if (isEdit) {
       EmployeeStore.updateEmployee(this.employee);
     } else {
+      this.employee.id = Date.now(); // id oluşturulmadıysa oluştur
       EmployeeStore.addEmployee(this.employee);
     }
 

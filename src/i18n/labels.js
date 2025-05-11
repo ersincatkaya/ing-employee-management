@@ -20,6 +20,8 @@ export const labels = {
       `Selected Employee record of ${name} will be deleted`,
     proceed: 'Proceed',
     searchPlaceholder: 'Search by name, email or position...',
+    tableView: 'Table View',
+    gridView: 'Grid View',
   },
   tr: {
     listTitle: 'Çalışan Listesi',
@@ -41,5 +43,7 @@ export const labels = {
     deleteMessage: (name) => `${name} isimli çalışanın kaydı silinecek`,
     proceed: 'Onayla',
     searchPlaceholder: 'İsim, e-posta veya pozisyona göre ara...',
+    tableView: 'Tablo Görünümü',
+    gridView: 'Karte Görünümü',
   },
 };
