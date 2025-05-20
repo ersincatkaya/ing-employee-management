@@ -57,28 +57,7 @@ describe('employee-list', () => {
   it('should render the correct number of table columns', async () => {
     const el = await createEmployeeList(mockEmployees);
     const headers = el.shadowRoot.querySelectorAll('thead th');
-    expect(headers.length).to.equal(10);
-  });
-
-  it('should dispatch edit-employee event with correct data when edit button is clicked', async () => {
-    const el = await createEmployeeList(mockEmployees);
-    let timeoutId;
-    const eventPromise = new Promise((resolve, reject) => {
-      el.addEventListener('edit-employee', (e) => {
-        clearTimeout(timeoutId);
-        resolve(e.detail);
-      });
-      timeoutId = setTimeout(() => {
-        reject(new Error('Timed out waiting for edit-employee event'));
-      }, 1000);
-    });
-    const editButton = el.shadowRoot.querySelector(
-      'tbody tr:first-child .icon-btn'
-    );
-    expect(editButton).to.exist;
-    editButton.click();
-    const eventDetail = await eventPromise;
-    expect(eventDetail).to.deep.equal(mockEmployees[0]);
+    expect(headers.length).to.equal(9);
   });
 
   it('should dispatch request-delete event with correct data when delete button is clicked', async () => {

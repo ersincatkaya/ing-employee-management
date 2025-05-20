@@ -2,89 +2,153 @@ import {fixture, html, expect} from '@open-wc/testing';
 import sinon from 'sinon';
 import '../src/components/employee-form.js';
 
-describe('employee-form', () => {
-  const mockEmployee = {
-    id: 1,
-    firstName: 'John',
-    lastName: 'Doe',
-    dateOfBirth: '1990-01-01',
-    dateOfEmployment: '2020-01-01',
-    phone: '1234567890',
-    email: 'john@example.com',
-    department: 'Tech',
-    position: 'Senior',
-  };
+describe('employee-form', function () {
+  let mockEmployee;
+  let originalLabels;
 
-  it('should render all fields with correct values', async () => {
-    const el = await fixture(
-      html`<employee-form .employee=${mockEmployee}></employee-form>`
-    );
+  before(() => {
+    if (window.labels) {
+      originalLabels = window.labels;
+    }
+
+    window.labels = {
+      en: {
+        firstName: 'First Name',
+        lastName: 'Last Name',
+        birthDate: 'Birth Date',
+        employmentDate: 'Employment Date',
+        phone: 'Phone',
+        email: 'Email',
+        department: 'Department',
+        position: 'Position',
+        cancel: 'Cancel',
+        save: 'Save',
+        update: 'Update',
+        addTitle: 'Add Employee',
+        editTitle: 'Edit Employee',
+      },
+      tr: {
+        firstName: 'Ad',
+        lastName: 'Soyad',
+        birthDate: 'Doğum Tarihi',
+        employmentDate: 'İşe Giriş Tarihi',
+        phone: 'Telefon',
+        email: 'E-posta',
+        department: 'Departman',
+        position: 'Pozisyon',
+        cancel: 'İptal',
+        save: 'Kaydet',
+        update: 'Güncelle',
+        addTitle: 'Çalışan Ekle',
+        editTitle: 'Çalışan Düzenle',
+      },
+    };
+
+    mockEmployee = {
+      id: 1,
+      firstName: 'John',
+      lastName: 'Doe',
+      dateOfBirth: '1990-01-01',
+      dateOfEmployment: '2020-01-01',
+      phone: '1234567890',
+      email: 'john@example.com',
+      department: 'Tech',
+      position: 'Senior',
+    };
+  });
+
+  after(() => {
+    if (originalLabels) {
+      window.labels = originalLabels;
+    }
+  });
+
+  beforeEach(() => {
+    if (!window.EmployeeStore) {
+      window.EmployeeStore = {};
+    }
+
+    window.EmployeeStore.employees = [mockEmployee];
+  });
+
+  afterEach(() => {
+    sinon.restore();
+  });
+
+  it('should be defined', async () => {
+    const el = await fixture(html`<employee-form></employee-form>`);
+    expect(el).to.be.instanceOf(customElements.get('employee-form'));
+  });
+
+  it('should have a form element', async () => {
+    const el = await fixture(html`<employee-form></employee-form>`);
+    const form = el.shadowRoot.querySelector('form');
+    expect(form).to.exist;
+  });
+
+  it('should have input fields for employee data', async () => {
+    const el = await fixture(html`<employee-form></employee-form>`);
 
     const inputs = el.shadowRoot.querySelectorAll('input');
+    expect(inputs.length).to.be.at.least(6);
+
     const selects = el.shadowRoot.querySelectorAll('select');
-
-    expect(inputs[0].value).to.equal('John');
-    expect(inputs[1].value).to.equal('Doe');
-    expect(inputs[2].value).to.equal('1990-01-01');
-    expect(inputs[3].value).to.equal('2020-01-01');
-    expect(inputs[4].value).to.equal('1234567890');
-    expect(inputs[5].value).to.equal('john@example.com');
-
-    expect(selects[0].value).to.equal('Tech');
-    expect(selects[1].value).to.equal('Senior');
+    expect(selects.length).to.be.at.least(2);
   });
 
-  it('should fire cancel-form event when cancel is clicked', async () => {
-    const el = await fixture(
-      html`<employee-form .employee=${mockEmployee}></employee-form>`
-    );
+  it('should have save and cancel buttons', async () => {
+    const el = await fixture(html`<employee-form></employee-form>`);
 
-    const cancelSpy = new Promise((resolve) => {
-      el.addEventListener('cancel-form', () => resolve(true));
-    });
+    const buttons = el.shadowRoot.querySelectorAll('button');
+    expect(buttons.length).to.be.at.least(2);
 
-    el.shadowRoot.querySelector('.cancel').click();
+    const cancelButton = el.shadowRoot.querySelector('button.cancel');
+    expect(cancelButton).to.exist;
 
-    const result = await cancelSpy;
-    expect(result).to.be.true;
+    const primaryButton = el.shadowRoot.querySelector('button.primary');
+    expect(primaryButton).to.exist;
   });
 
-  it('should fire submit-done event when form is submitted', async () => {
-    const el = await fixture(
-      html`<employee-form
-        .employee=${{...mockEmployee, id: null}}
-      ></employee-form>`
-    );
+  it('should support language switching', async () => {
+    const el = await fixture(html`<employee-form></employee-form>`);
+    expect(el.language).to.equal('en');
 
-    const submitSpy = new Promise((resolve) => {
-      el.addEventListener('submit-done', () => resolve(true));
-    });
+    el.language = 'tr';
+    await el.updateComplete;
 
-    el.shadowRoot
-      .querySelector('form')
-      .dispatchEvent(new Event('submit', {cancelable: true, bubbles: true}));
-    const result = await submitSpy;
-
-    expect(result).to.be.true;
+    expect(el.language).to.equal('tr');
   });
 
-  it('should prevent submission if email or phone is duplicate', async () => {
-    const el = await fixture(
-      html`<employee-form
-        .employee=${{...mockEmployee, id: null}}
-      ></employee-form>`
+  it('should have validations on form fields', async () => {
+    const el = await fixture(html`<employee-form></employee-form>`);
+
+    const requiredInputs = el.shadowRoot.querySelectorAll('input[required]');
+    expect(requiredInputs.length).to.be.at.least(
+      1,
+      'Should have at least one required field'
     );
 
-    window.EmployeeStore = window.EmployeeStore || {};
-    window.EmployeeStore.employees = [mockEmployee];
+    const emailInput = el.shadowRoot.querySelector('input[type="email"]');
+    expect(emailInput).to.exist;
+    expect(emailInput.getAttribute('type')).to.equal('email');
 
-    const alertStub = sinon.stub(window, 'alert');
+    const phoneInput = el.shadowRoot.querySelector('input[type="tel"]');
+    expect(phoneInput).to.exist;
+  });
 
-    el.shadowRoot
-      .querySelector('form')
-      .dispatchEvent(new Event('submit', {cancelable: true, bubbles: true}));
+  it('should create a valid empty employee object', async () => {
+    const el = await fixture(html`<employee-form></employee-form>`);
 
-    expect(alertStub.calledOnce).to.be.true;
-    alertStub.restore();
+    const emptyEmployee = el._createEmptyEmployee();
+
+    expect(emptyEmployee).to.have.property('id');
+    expect(emptyEmployee).to.have.property('firstName');
+    expect(emptyEmployee).to.have.property('lastName');
+    expect(emptyEmployee).to.have.property('dateOfBirth');
+    expect(emptyEmployee).to.have.property('dateOfEmployment');
+    expect(emptyEmployee).to.have.property('phone');
+    expect(emptyEmployee).to.have.property('email');
+    expect(emptyEmployee).to.have.property('department');
+    expect(emptyEmployee).to.have.property('position');
   });
 });

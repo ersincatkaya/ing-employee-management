@@ -1,7 +1,6 @@
 import {LitElement, html, css} from 'lit';
 import './app-header.js';
 import './employee-list.js';
-import './employee-dialog.js';
 import './delete-dialog.js';
 import {EmployeeStore} from '../store/EmployeeStore.js';
 import {labels} from '../i18n/labels.js';
@@ -21,6 +20,7 @@ export class AppWrapper extends LitElement {
       display: block;
       background-color: #f8f8f8;
       border: 2px solid transparent;
+      overflow-x: hidden;
     }
 
     :host(.confirming) {
@@ -146,7 +146,6 @@ export class AppWrapper extends LitElement {
             .language=${this.language}
           ></employee-list>
         </div>
-        <employee-dialog></employee-dialog>
         <delete-dialog
           .open=${this.showDeleteDialog}
           .employee=${this.employeeToDelete}

@@ -1,4 +1,5 @@
 import {LitElement, html, css} from 'lit';
+import {Router} from '@vaadin/router';
 import {labels} from '../i18n/labels.js';
 
 export class AppHeader extends LitElement {
@@ -87,7 +88,7 @@ export class AppHeader extends LitElement {
     return html`
       <header>
         <div class="logo">
-          <img src="/assets/ing.jpg" alt="Logo" />
+          <img src="/ing.jpg" alt="Logo" />
           <strong>ING</strong>
         </div>
         <div class="actions">
@@ -114,13 +115,13 @@ export class AppHeader extends LitElement {
           </div>
           <img
             class="flag ${this.language === 'en' ? 'active' : ''}"
-            src="/assets/en-flag.png"
+            src="/en-flag.png"
             alt="EN"
             @click=${() => this._setLanguage('en')}
           />
           <img
             class="flag ${this.language === 'tr' ? 'active' : ''}"
-            src="/assets/tr-flag.png"
+            src="/tr-flag.png"
             alt="TR"
             @click=${() => this._setLanguage('tr')}
           />
@@ -130,7 +131,7 @@ export class AppHeader extends LitElement {
   }
 
   _openDialog() {
-    window.dispatchEvent(new CustomEvent('open-employee-dialog'));
+    Router.go('/add');
   }
 
   _setLanguage(lang) {

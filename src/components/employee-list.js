@@ -1,4 +1,5 @@
 import {LitElement, html, css} from 'lit';
+import {Router} from '@vaadin/router';
 import {labels} from '../i18n/labels.js';
 import {EmployeeStore} from '../store/EmployeeStore.js';
 
@@ -54,7 +55,6 @@ export class EmployeeList extends LitElement {
       border-collapse: collapse;
       background: white;
       border-radius: 6px;
-      overflow: auto;
     }
 
     th,
@@ -246,13 +246,7 @@ export class EmployeeList extends LitElement {
   }
 
   _edit(emp) {
-    this.dispatchEvent(
-      new CustomEvent('edit-employee', {
-        detail: emp,
-        bubbles: true,
-        composed: true,
-      })
-    );
+    Router.go(`/edit/${emp.id}`);
   }
 
   _setView(mode) {
@@ -270,7 +264,6 @@ export class EmployeeList extends LitElement {
       <table>
         <thead>
           <tr>
-            <th><input type="checkbox" /></th>
             <th>${t.firstName}</th>
             <th>${t.lastName}</th>
             <th>${t.employmentDate}</th>
@@ -286,7 +279,6 @@ export class EmployeeList extends LitElement {
           ${this.paginatedEmployees.map(
             (emp) => html`
               <tr>
-                <td><input type="checkbox" /></td>
                 <td>${emp.firstName}</td>
                 <td>${emp.lastName}</td>
                 <td>${emp.dateOfEmployment}</td>
@@ -319,6 +311,7 @@ export class EmployeeList extends LitElement {
       </table>
     `;
   }
+
   _onSearch(e) {
     clearTimeout(this._searchDebounceTimer);
     const value = e.target.value;
